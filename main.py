@@ -1,17 +1,17 @@
 from dotenv import load_dotenv
 from modules.db import initialize_db
-from modules.transactions import add_transaction, get_transactions
+from modules.transactions import add_transaction, get_transactions, delete_transaction, update_transaction
 from modules.reports import generate_report
 
 def main():
     #Load the environment variables
     load_dotenv()
     db = initialize_db()
+    user = input("Enter the user ID: ")
 
     # Add a sample transaction
-    objective = input("Would you like to add, update, or delete a transaction? (add/update/delete): ").strip().lower()
+    objective = input("Would you like to add, update, or delete a transaction? (add/update/delete/pass): ").strip().lower()
     if objective == 'add':
-        user = input("Enter the user ID: ")
         amount = float(input("Enter the amount: "))
         category = input("Enter the category (income/expense): ").strip().lower()
         description = input("Enter a description: ")
@@ -19,18 +19,26 @@ def main():
     elif objective == 'update':
         transaction_id = input("Enter the transaction ID to update: ")
         new_amount = float(input("Enter the new amount: "))
-        # Update logic would go here
+        new_category = input("Enter the new category (income/expense): ").strip().lower()
+        new_description = input("Enter the new description: ")
+        update_transaction(db, user, transaction_id, new_amount, new_category, new_description)
     elif objective == 'delete':
         transaction_id = input("Enter the transaction ID to delete: ")
-        # Delete logic would go here
+        delete_transaction(db, user, transaction_id)
 
     # Retrieve and print transactions
-    transactions = get_transactions(db, 'sample_user')
-    print("Transactions:", transactions)
+    view_transaction = input("Would you like to view transactions? (yes/no): ").strip().lower()
+    if view_transaction == 'yes':
+        transactions = get_transactions(db, user)
+        print("\nTransactions:", transactions)
 
     # Generate a report
-    report = generate_report(db, 'sample_user')
-    print("Financial Report:", report)
+    view_report = input("Would you like to generate a financial report? (yes/no): ").strip().lower()
+    report = generate_report(db, user)
+    if view_report == 'yes':
+        generate_report(db, user)
+        print("Financial report generated.")
+        print("Financial Report:", report)
 
 
 
