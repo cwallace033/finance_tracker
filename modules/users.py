@@ -7,7 +7,7 @@ def create_user(db):
         quit()
     user_id = input("Enter the user ID: ")
     user_email = input("Enter a user email: ")
-    user_balance = float(input("Enter your balance: "))
+    user_balance = 0
     doc_ref = db.collection('users').document(user_id)
     doc_ref.set({
         'name': user_id,

@@ -15,7 +15,12 @@ def add_transaction(db, user_id, amount, category, description):
 
     if user_doc.exists:
         current_balance = user_doc.to_dict().get('balance', 0)
-        new_balance = current_balance + amount if category == 'income' else current_balance - amount
+        if category == 'income':
+            new_balance = current_balance + amount  
+        elif category == 'expense':
+            new_balance = current_balance - amount  
+        else:
+            new_balance = current_balance
         user_ref.update({'balance': new_balance})
         print(f"Transaction added for {user_id}: {description} - ${amount}")
         print(f"New balance: ${new_balance}")
@@ -41,7 +46,18 @@ def update_transaction(db, user_id, transaction_id, new_amount, new_category, ne
         user_doc = user_ref.get()
         if user_doc.exists:
             current_balance = user_doc.to_dict().get('balance', 0)
-            current_balance += (new_amount - old_amount) if new_category == 'income' else current_balance - (new_amount - old_amount)
+            if new_category == 'income':
+                current_balance += new_amount
+            elif new_category == 'expense':
+                current_balance -= new_amount
+            else:
+                current_balance
+
+            if old_category == 'income':
+                current_balance -= old_amount
+            elif old_category == 'expense':
+                current_balance += old_amount
+
             user_ref.update({'balance': current_balance})
             print(f"Transaction {transaction_id} updated.")
             print(f"New balance: ${current_balance}")
@@ -79,6 +95,18 @@ def get_transactions(db, user_id):
     transactions_ref = db.collection('users').document(user_id).collection('transactions')
     docs = transactions_ref.stream()
     return [{doc.id: doc.to_dict()} for doc in docs]
+
+def pretty_print_transactions(transactions):
+    print("\nTransaction History:")
+    print("=" * 40)
+    for transaction in transactions:
+        for transaction_id, details in transaction.items():
+            print(f"Transaction ID: {transaction_id}")
+            print(f"  Amount: ${details.get('amount', 0):.2f}")
+            print(f"  Category: {details.get('category', 'N/A').title()}")
+            print(f"  Description: {details.get('description', 'No description')}")
+            print(f"  Timestamp: {details.get('timestamp', 'Unknown')}")
+            print("-" * 40)
 
 def get_transaction_id(db, user_id):
     #Get the most recent transaction ID for a user
