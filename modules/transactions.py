@@ -79,3 +79,13 @@ def get_transactions(db, user_id):
     transactions_ref = db.collection('users').document(user_id).collection('transactions')
     docs = transactions_ref.stream()
     return [{doc.id: doc.to_dict()} for doc in docs]
+
+def get_transaction_id(db, user_id):
+    #Get the most recent transaction ID for a user
+    transactions_ref = db.collection('users').document(user_id).collection('transactions')
+    docs = transactions_ref.stream()
+    transaction_ids = [doc.id for doc in docs]
+    if transaction_ids:
+        return transaction_ids[-1]
+    else:
+        return None

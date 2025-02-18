@@ -22,3 +22,12 @@ def generate_report(db, user_id):
         'balance': balance,
         'transactions': details
     }
+
+def display_financial_report(report):
+    # Prints the financial report all pretty 
+    print("\n=== Financial Report ===")
+    print(f"Total Income: ${report['income']:.2f}")
+    print(f"Total Expenses: ${report['expenses']:.2f}")
+    print(f"Balance: ${report['balance']:.2f}")
+    print(f"Number of Transactions: {len(report['transactions'])}")
+    print("========================\n")
